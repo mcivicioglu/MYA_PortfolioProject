@@ -1,0 +1,47 @@
+@model Skill
+@{
+    ViewData["Title"] = "Yetenek Düzenle";
+    ViewData["FormAction"] = "UpdateSkill";
+    ViewData["FormTitle"] = "Grubu Düzenle";
+}
+<div class="row g-4">
+    <div class="col-xl-7">
+        <partial name="_SkillForm" model="Model" />
+    </div>
+    <div class="col-xl-5">
+        <div class="ad-card">
+            <div class="ad-card-head">
+                <div><h2>Teknolojiler</h2><p>Kartın altında etiket olarak listelenir.</p></div>
+                <span class="ad-badge on">@Model.SkillItems.Count</span>
+            </div>
+
+            <form asp-action="CreateSkillItem" method="post" class="d-flex gap-2 mb-3">
+                <input type="hidden" name="skillId" value="@Model.SkillId">
+                <input type="text" name="skillItemTitle" class="form-control" placeholder="Örn: Entity Framework Core" maxlength="100" required aria-label="Yeni teknoloji adı">
+                <button type="submit" class="ad-btn"><i class="bi bi-plus-lg"></i><span class="d-none d-sm-inline">Ekle</span></button>
+            </form>
+
+            @if (Model.SkillItems.Any())
+            {
+                <ul class="ad-list">
+                    @foreach (var item in Model.SkillItems.OrderBy(x => x.SkillItemId))
+                    {
+                        <li>
+                            <form asp-action="UpdateSkillItem" asp-route-id="@item.SkillItemId" method="post" class="d-flex gap-2 flex-grow-1">
+                                <input type="text" name="skillItemTitle" value="@item.SkillItemTitle" class="form-control py-2" maxlength="100" required aria-label="Teknoloji adı">
+                                <button type="submit" class="ad-icon-btn sm" title="Kaydet"><i class="bi bi-check2"></i></button>
+                            </form>
+                            <form asp-action="DeleteSkillItem" asp-route-id="@item.SkillItemId" method="post">
+                                <button type="button" class="ad-icon-btn sm danger js-delete" data-name="@item.SkillItemTitle" title="Sil"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <div class="ad-empty py-4"><i class="bi bi-tags"></i>Bu gruba henüz teknoloji eklenmedi.</div>
+            }
+        </div>
+    </div>
+</div>

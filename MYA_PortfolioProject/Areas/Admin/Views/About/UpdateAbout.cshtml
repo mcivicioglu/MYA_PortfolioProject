@@ -1,0 +1,58 @@
+@model About
+@{
+    ViewData["Title"] = "Hakkımda";
+}
+<form asp-action="UpdateAbout" method="post" enctype="multipart/form-data">
+    <div class="row g-4">
+        <div class="col-xl-8">
+            <div class="ad-card">
+                <div class="ad-card-head">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="ad-head-ico"><i class="bi bi-person"></i></div>
+                        <div><h2>Kişisel Bilgiler</h2><p>Ad soyad; sitenin menüsünde, footer'ında ve bu panelde de kullanılır.</p></div>
+                    </div>
+                </div>
+                <div asp-validation-summary="ModelOnly"></div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="NameSurname" class="form-label">Ad Soyad</label>
+                        <input asp-for="NameSurname" class="form-control">
+                        <span asp-validation-for="NameSurname"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Profession" class="form-label">Meslek / Unvan</label>
+                        <input asp-for="Profession" class="form-control" placeholder="Yazılım Geliştirici">
+                        <span asp-validation-for="Profession"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Location" class="form-label">Konum</label>
+                        <input asp-for="Location" class="form-control" placeholder="İzmir, Türkiye">
+                        <span asp-validation-for="Location"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Title" class="form-label">Bölüm Başlığı</label>
+                        <input asp-for="Title" class="form-control" placeholder="Teknolojiye Tutkuyla Bağlı Bir Yolculuk.">
+                        <span asp-validation-for="Title"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Description" class="form-label">Hakkımda Metni</label>
+                        <textarea asp-for="Description" class="form-control" rows="9"></textarea>
+                        <div class="form-text">Her satır sitede ayrı bir paragraf olarak gösterilir.</div>
+                        <span asp-validation-for="Description"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4">
+            <div class="ad-card">
+                <div class="ad-section-title">Dosyalar</div>
+                <partial name="_FileInput" model='new FileInputModel { Name = "imageFile", Label = "Portre görseli", CurrentUrl = Model.MainImageUrl, Portrait = true, RemoveName = "removeImage" }' />
+                <partial name="_FileInput" model='new FileInputModel { Name = "cvFile", Label = "Özgeçmiş (PDF)", CurrentUrl = Model.AboutCVUrl, IsImage = false, Accept = ".pdf", Hint = "PDF · en fazla 5 MB. Yüklenirse sitede “Özgeçmişimi İncele” butonu çıkar.", RemoveName = "removeCv" }' />
+                <div class="ad-form-foot">
+                    <button type="submit" class="ad-btn"><i class="bi bi-check2"></i> Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,87 @@
+@model List<Project>
+@{
+    ViewData["Title"] = "Projeler";
+    var selectedSort = ViewBag.SelectedSort as string ?? "newest";
+    var tr = new System.Globalization.CultureInfo("tr-TR");
+}
+<div class="ad-card">
+    <div class="ad-card-head">
+        <div class="d-flex align-items-center gap-3">
+            <div class="ad-head-ico"><i class="bi bi-code-square"></i></div>
+            <div><h2>Projeler</h2><p>@Model.Count proje listeleniyor · Pasif projeler sitede görünmez.</p></div>
+        </div>
+        <a asp-action="CreateProject" class="ad-btn"><i class="bi bi-plus-lg"></i> Yeni Proje</a>
+    </div>
+
+    <form method="get" asp-action="ProjectList" class="row g-2 mb-4">
+        <div class="col-md-5">
+            <select name="categoryId" asp-items="@(ViewBag.Categories as SelectList)" class="form-select" aria-label="Kategori">
+                <option value="">Tüm kategoriler</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <select name="sort" class="form-select" aria-label="Sıralama">
+                <option value="newest" selected="@(selectedSort == "newest")">En yeni önce</option>
+                <option value="oldest" selected="@(selectedSort == "oldest")">En eski önce</option>
+                <option value="title" selected="@(selectedSort == "title")">Ada göre (A-Z)</option>
+            </select>
+        </div>
+        <div class="col-md-3 d-flex gap-2">
+            <button type="submit" class="ad-btn flex-grow-1">Filtrele</button>
+            <a asp-action="ProjectList" class="ad-btn-light">Temizle</a>
+        </div>
+    </form>
+
+    @if (Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table ad-table">
+                <thead><tr><th>Görsel</th><th>Proje</th><th>Kategori</th><th>Tarih</th><th>Durum</th><th class="text-end">İşlemler</th></tr></thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
+                                {
+                                    <img src="@item.ImageUrl" class="ad-thumb" alt="">
+                                }
+                                else
+                                {
+                                    <div class="ad-thumb"><i class="bi bi-image"></i></div>
+                                }
+                            </td>
+                            <td>
+                                <strong>@item.ProjectTitle</strong>
+                                <div class="small text-muted text-truncate" style="max-width: 300px;">@item.Technology</div>
+                            </td>
+                            <td>@item.Category?.CategoryName</td>
+                            <td class="text-nowrap">@item.CreatedDate.ToString("dd MMM yyyy", tr)</td>
+                            <td>
+                                <form asp-action="ToggleProjectStatus" asp-route-id="@item.ProjectId" method="post">
+                                    <button type="submit" class="ad-badge @(item.IsActive ? "on" : "off")" title="Durumu değiştir">@(item.IsActive ? "Aktif" : "Pasif")</button>
+                                </form>
+                            </td>
+                            <td>
+                                <div class="ad-actions">
+                                    @if (!string.IsNullOrWhiteSpace(item.ProjectUrl))
+                                    {
+                                        <a href="@item.ProjectUrl" target="_blank" rel="noopener noreferrer" class="ad-icon-btn sm" title="Projeyi aç"><i class="bi bi-box-arrow-up-right"></i></a>
+                                    }
+                                    <a asp-action="UpdateProject" asp-route-id="@item.ProjectId" class="ad-icon-btn sm" title="Düzenle"><i class="bi bi-pencil"></i></a>
+                                    <form asp-action="DeleteProject" asp-route-id="@item.ProjectId" method="post">
+                                        <button type="button" class="ad-icon-btn sm danger js-delete" data-name="@item.ProjectTitle" title="Sil"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="ad-empty"><i class="bi bi-folder2-open"></i>Gösterilecek proje bulunamadı.</div>
+    }
+</div>

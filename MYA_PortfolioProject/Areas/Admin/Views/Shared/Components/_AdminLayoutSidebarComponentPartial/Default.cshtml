@@ -1,0 +1,71 @@
+@{
+    var current = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    string Active(params string[] controllers) =>
+        controllers.Any(c => string.Equals(current, c, StringComparison.OrdinalIgnoreCase)) ? " active" : "";
+
+    var name = ViewBag.NameSurname as string ?? "Portfolyo";
+    var initials = string.Concat(name.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(x => char.ToUpper(x[0], new System.Globalization.CultureInfo("tr-TR"))));
+    int unread = ViewBag.UnreadMessageCount is int u ? u : 0;
+
+    var groups = new (string Label, (string Controller, string Action, string Icon, string Text)[] Items)[]
+    {
+        ("Genel", new[] {
+            ("Dashboard", "Index", "bi-grid-1x2", "Dashboard")
+        }),
+        ("İçerik", new[] {
+            ("Hero", "UpdateHero", "bi-house-door", "Ana Sayfa (Hero)"),
+            ("HeroTitle", "HeroTitleList", "bi-type", "Yazı Animasyonu"),
+            ("About", "UpdateAbout", "bi-person", "Hakkımda"),
+            ("Skill", "SkillList", "bi-stars", "Yetenekler"),
+            ("Experience", "ExperienceList", "bi-briefcase", "Deneyimler"),
+            ("Project", "ProjectList", "bi-code-square", "Projeler"),
+            ("Category", "CategoryList", "bi-tags", "Kategoriler"),
+            ("Education", "EducationList", "bi-mortarboard", "Eğitim"),
+            ("Certificate", "CertificateList", "bi-award", "Sertifikalar")
+        }),
+        ("İletişim", new[] {
+            ("Contact", "UpdateContact", "bi-geo-alt", "İletişim Bilgileri"),
+            ("Social", "SocialList", "bi-share", "Sosyal Medya"),
+            ("Message", "MessageList", "bi-inbox", "Gelen Mesajlar")
+        })
+    };
+}
+<aside class="ad-sidebar" id="adSidebar">
+    <div class="ad-brand">
+        <div class="ad-brand-mark">@initials</div>
+        <div class="ad-brand-text">
+            <strong>@name<span>.</span></strong>
+            <small>Yönetim Paneli</small>
+        </div>
+    </div>
+
+    <nav class="ad-nav" aria-label="Yönetim menüsü">
+        @foreach (var group in groups)
+        {
+            <div class="ad-nav-label">@group.Label</div>
+            <ul>
+                @foreach (var item in group.Items)
+                {
+                    <li>
+                        <a asp-area="Admin" asp-controller="@item.Controller" asp-action="@item.Action"
+                           class="ad-link@(Active(item.Controller))">
+                            <i class="bi @item.Icon"></i>
+                            <span>@item.Text</span>
+                            @if (item.Controller == "Message" && unread > 0)
+                            {
+                                <span class="ad-count" id="sidebarUnreadBadge">@unread</span>
+                            }
+                        </a>
+                    </li>
+                }
+            </ul>
+        }
+    </nav>
+
+    <div class="ad-sidebar-foot">
+        <a asp-area="" asp-controller="Default" asp-action="Index" target="_blank" class="ad-link">
+            <i class="bi bi-box-arrow-up-right"></i>
+            <span>Siteyi Görüntüle</span>
+        </a>
+    </div>
+</aside>

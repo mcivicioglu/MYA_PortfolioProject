@@ -1,0 +1,28 @@
+using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
+namespace MYA_PortfolioProject.Migrations;
+
+/// <inheritdoc />
+public partial class _20261119121847_mig7 : Migration
+{
+    /// <inheritdoc />
+    protected override void Up(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.AddColumn<string>(
+            name: "ProjectUrl",
+            table: "Projects",
+            type: "nvarchar(500)",
+            maxLength: 500,
+            nullable: true);
+    }
+
+    /// <inheritdoc />
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.DropColumn(
+            name: "ProjectUrl",
+            table: "Projects");
+    }
+}

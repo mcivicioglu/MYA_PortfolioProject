@@ -1,0 +1,32 @@
+@{
+    int unread = ViewBag.UnreadMessageCount is int u ? u : 0;
+}
+<header class="ad-topbar">
+    <div class="d-flex align-items-center gap-3 min-w-0">
+        <button class="ad-icon-btn d-xl-none" id="adSidebarToggle" type="button" aria-label="Menüyü aç/kapat" aria-controls="adSidebar" aria-expanded="false">
+            <i class="bi bi-list"></i>
+        </button>
+        <div class="min-w-0">
+            <div class="ad-crumb">
+                <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Panel</a>
+                <span>/</span>
+                <span>@(ViewData["Title"] ?? "Dashboard")</span>
+            </div>
+            <h1 class="ad-page-title">@(ViewData["Title"] ?? "Dashboard")</h1>
+        </div>
+    </div>
+
+    <div class="d-flex align-items-center gap-2">
+        <a asp-area="Admin" asp-controller="Message" asp-action="MessageList" asp-route-status="unread"
+           class="ad-icon-btn position-relative" title="@(unread > 0 ? $"{unread} okunmamış mesaj" : "Okunmamış mesaj yok")">
+            <i class="bi bi-bell"></i>
+            @if (unread > 0)
+            {
+                <span class="ad-dot" id="navUnreadDot"></span>
+            }
+        </a>
+        <a asp-area="Admin" asp-controller="Project" asp-action="CreateProject" class="ad-btn d-none d-sm-inline-flex">
+            <i class="bi bi-plus-lg"></i> Yeni Proje
+        </a>
+    </div>
+</header>

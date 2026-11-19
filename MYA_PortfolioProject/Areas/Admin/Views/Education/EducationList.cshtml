@@ -1,0 +1,48 @@
+@model List<Education>
+@{
+    ViewData["Title"] = "Eğitim";
+}
+<div class="ad-card">
+    <div class="ad-card-head">
+        <div class="d-flex align-items-center gap-3">
+            <div class="ad-head-ico"><i class="bi bi-mortarboard"></i></div>
+            <div><h2>Eğitim Hayatı</h2><p>Devam eden eğitimler sitede en üstte gösterilir.</p></div>
+        </div>
+        <a asp-action="CreateEducation" class="ad-btn"><i class="bi bi-plus-lg"></i> Yeni Eğitim</a>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table ad-table">
+                <thead><tr><th>Bölüm</th><th>Okul</th><th>Yıllar</th><th class="text-end">İşlemler</th></tr></thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><strong>@item.Department</strong></td>
+                            <td>@item.SchoolName</td>
+                            <td>
+                                @item.StartYear –
+                                @if (item.EndYear.HasValue) { @item.EndYear }
+                                else { <span class="ad-badge on">Devam ediyor</span> }
+                            </td>
+                            <td>
+                                <div class="ad-actions">
+                                    <a asp-action="UpdateEducation" asp-route-id="@item.EducationId" class="ad-icon-btn sm" title="Düzenle"><i class="bi bi-pencil"></i></a>
+                                    <form asp-action="DeleteEducation" asp-route-id="@item.EducationId" method="post">
+                                        <button type="button" class="ad-icon-btn sm danger js-delete" data-name="@item.Department" title="Sil"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="ad-empty"><i class="bi bi-mortarboard"></i>Henüz eğitim bilgisi eklenmedi.</div>
+    }
+</div>

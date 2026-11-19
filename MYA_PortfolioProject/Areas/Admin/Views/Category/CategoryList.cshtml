@@ -1,0 +1,62 @@
+@model List<Category>
+@{
+    ViewData["Title"] = "Kategoriler";
+    var counts = ViewBag.ProjectCounts as Dictionary<int, int> ?? new Dictionary<int, int>();
+    var newCategory = ViewBag.NewCategory as Category ?? new Category();
+}
+<div class="row g-4">
+    <div class="col-xl-8">
+        <div class="ad-card">
+            <div class="ad-card-head">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="ad-head-ico"><i class="bi bi-tags"></i></div>
+                    <div><h2>Proje Kategorileri</h2><p>Sitede proje filtrelerinde, yalnızca aktif projesi olan kategoriler gösterilir.</p></div>
+                </div>
+            </div>
+
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table ad-table">
+                        <thead><tr><th>Kategori</th><th>Proje</th><th class="text-end">İşlemler</th></tr></thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                var count = counts.TryGetValue(item.CategoryId, out var c) ? c : 0;
+                                <tr>
+                                    <td><strong>@item.CategoryName</strong></td>
+                                    <td>
+                                        <a asp-controller="Project" asp-action="ProjectList" asp-route-categoryId="@item.CategoryId" class="ad-badge @(count > 0 ? "on" : "off") text-decoration-none">@count proje</a>
+                                    </td>
+                                    <td>
+                                        <div class="ad-actions">
+                                            <a asp-action="UpdateCategory" asp-route-id="@item.CategoryId" class="ad-icon-btn sm" title="Düzenle"><i class="bi bi-pencil"></i></a>
+                                            <form asp-action="DeleteCategory" asp-route-id="@item.CategoryId" method="post">
+                                                <button type="button" class="ad-icon-btn sm danger js-delete" data-name="@item.CategoryName" title="Sil"><i class="bi bi-trash"></i></button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="ad-empty"><i class="bi bi-tags"></i>Henüz kategori yok. Proje eklemeden önce en az bir kategori oluşturun.</div>
+            }
+        </div>
+    </div>
+    <div class="col-xl-4">
+        <form asp-action="CreateCategory" method="post" class="ad-card">
+            <div class="ad-section-title">Yeni Kategori</div>
+            <div class="mb-3">
+                <label for="CategoryName" class="form-label">Kategori Adı</label>
+                <input type="text" name="CategoryName" id="CategoryName" value="@newCategory.CategoryName" class="form-control" required maxlength="50" placeholder="Web Uygulamaları">
+                @Html.ValidationMessage("CategoryName")
+            </div>
+            <button type="submit" class="ad-btn w-100"><i class="bi bi-plus-lg"></i> Ekle</button>
+        </form>
+    </div>
+</div>

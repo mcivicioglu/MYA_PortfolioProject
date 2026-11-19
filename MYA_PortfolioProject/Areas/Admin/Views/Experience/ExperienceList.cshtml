@@ -1,0 +1,52 @@
+@model List<Experience>
+@{
+    ViewData["Title"] = "Deneyimler";
+}
+<div class="ad-card">
+    <div class="ad-card-head">
+        <div class="d-flex align-items-center gap-3">
+            <div class="ad-head-ico"><i class="bi bi-briefcase"></i></div>
+            <div><h2>Kariyer Yolculuğu</h2><p>@Model.Count kayıt · Pasif deneyimler sitede gösterilmez.</p></div>
+        </div>
+        <a asp-action="CreateExperience" class="ad-btn"><i class="bi bi-plus-lg"></i> Yeni Deneyim</a>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table ad-table">
+                <thead><tr><th>Pozisyon</th><th>Şirket</th><th>Etiket</th><th>Durum</th><th class="text-end">İşlemler</th></tr></thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@item.Title</strong>
+                                <div class="small text-muted text-truncate" style="max-width: 360px;">@item.Description</div>
+                            </td>
+                            <td>@item.Company</td>
+                            <td><span class="ad-badge terra">@item.CategoryName</span></td>
+                            <td>
+                                <form asp-action="ToggleExperienceStatus" asp-route-id="@item.ExperienceId" method="post">
+                                    <button type="submit" class="ad-badge @(item.IsActive ? "on" : "off")" title="Durumu değiştir">@(item.IsActive ? "Aktif" : "Pasif")</button>
+                                </form>
+                            </td>
+                            <td>
+                                <div class="ad-actions">
+                                    <a asp-action="UpdateExperience" asp-route-id="@item.ExperienceId" class="ad-icon-btn sm" title="Düzenle"><i class="bi bi-pencil"></i></a>
+                                    <form asp-action="DeleteExperience" asp-route-id="@item.ExperienceId" method="post">
+                                        <button type="button" class="ad-icon-btn sm danger js-delete" data-name="@item.Title" title="Sil"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="ad-empty"><i class="bi bi-briefcase"></i>Henüz deneyim eklenmedi.</div>
+    }
+</div>

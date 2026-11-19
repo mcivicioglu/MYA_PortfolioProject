@@ -1,0 +1,202 @@
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+    var firstName = Model.NameSurname.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? "Admin";
+    var maxDay = Math.Max(1, Model.Last7Days.Max(x => x.Count));
+    var maxCategory = Math.Max(1, Model.CategorySummary.Select(x => x.ProjectCount).DefaultIfEmpty(0).Max());
+    var tr = new System.Globalization.CultureInfo("tr-TR");
+    string Initials(string name) => string.Concat(name.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(x => char.ToUpper(x[0], tr)));
+}
+
+<div class="row g-4">
+    <div class="col-12">
+        <section class="ad-hello">
+            <span class="eyebrow">HOŞ GELDİN</span>
+            <h2>Merhaba @firstName, portfolyon seni bekliyor.</h2>
+            <p>
+                @if (Model.UnreadMessages > 0)
+                {
+                    <text>@Model.UnreadMessages okunmamış mesajın var. </text>
+                }
+                Bölümleri soldaki menüden güncelleyebilir, değişiklikleri sitede hemen görebilirsin.
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+                <a asp-controller="Message" asp-action="MessageList" class="ad-btn"><i class="bi bi-inbox"></i> Gelen Kutusu</a>
+                <a asp-area="" asp-controller="Default" asp-action="Index" target="_blank" class="ad-btn-light"><i class="bi bi-box-arrow-up-right"></i> Siteyi Görüntüle</a>
+            </div>
+        </section>
+    </div>
+
+    @if (Model.MissingSections.Any())
+    {
+        <div class="col-12">
+            <div class="ad-card d-flex flex-wrap align-items-center gap-3" style="border-color: var(--terra);">
+                <div class="ad-head-ico terra"><i class="bi bi-exclamation-triangle"></i></div>
+                <div class="flex-grow-1">
+                    <strong>Henüz doldurulmamış bölümler var</strong>
+                    <div class="small text-muted">Sitede varsayılan metinler görünüyor: @string.Join(", ", Model.MissingSections)</div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="col-sm-6 col-xxl-3">
+        <a asp-controller="Project" asp-action="ProjectList" class="ad-stat">
+            <div class="ad-head-ico"><i class="bi bi-code-square"></i></div>
+            <div><b>@Model.TotalProjects</b><span>Proje</span><small>@Model.ActiveProjects aktif</small></div>
+        </a>
+    </div>
+    <div class="col-sm-6 col-xxl-3">
+        <a asp-controller="Skill" asp-action="SkillList" class="ad-stat">
+            <div class="ad-head-ico terra"><i class="bi bi-stars"></i></div>
+            <div><b>@Model.SkillCount</b><span>Yetenek Grubu</span><small>@Model.SkillItemCount teknoloji</small></div>
+        </a>
+    </div>
+    <div class="col-sm-6 col-xxl-3">
+        <a asp-controller="Experience" asp-action="ExperienceList" class="ad-stat">
+            <div class="ad-head-ico"><i class="bi bi-briefcase"></i></div>
+            <div><b>@Model.ExperienceCount</b><span>Deneyim</span><small>@Model.EducationCount eğitim · @Model.CertificateCount sertifika</small></div>
+        </a>
+    </div>
+    <div class="col-sm-6 col-xxl-3">
+        <a asp-controller="Message" asp-action="MessageList" class="ad-stat dark">
+            <div class="ad-head-ico"><i class="bi bi-envelope"></i></div>
+            <div><b>@Model.TotalMessages</b><span>Mesaj</span><small>@Model.UnreadMessages okunmamış</small></div>
+        </a>
+    </div>
+
+    <div class="col-xl-7">
+        <div class="ad-card h-100">
+            <div class="ad-card-head">
+                <div><h2>Son 7 Gün</h2><p>Gün bazında gelen mesajlar</p></div>
+                <span class="ad-badge on">Toplam @Model.Last7Days.Sum(x => x.Count)</span>
+            </div>
+            <div class="ad-bars" role="img" aria-label="Son 7 günde gelen mesaj sayıları">
+                @foreach (var day in Model.Last7Days)
+                {
+                    <div class="ad-bar @(day.IsToday ? "today" : "")">
+                        <b>@day.Count</b>
+                        <div class="ad-bar-fill" style="height:@(day.Count * 100 / maxDay)%"></div>
+                        <small>@day.Label</small>
+                    </div>
+                }
+            </div>
+            <div class="mt-4">
+                <div class="d-flex justify-content-between small mb-2">
+                    <span class="text-muted">Okunma oranı</span>
+                    <strong>%@Model.ReadRate</strong>
+                </div>
+                <div class="ad-progress"><span style="width:@Model.ReadRate%"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-5">
+        <div class="ad-card h-100">
+            <div class="ad-card-head">
+                <div><h2>Son Mesajlar</h2><p>Gelen kutusundaki en yeni 5 mesaj</p></div>
+                <a asp-controller="Message" asp-action="MessageList" class="ad-btn-light ad-btn-sm">Tümü</a>
+            </div>
+            @if (Model.LastMessages.Any())
+            {
+                <ul class="ad-list">
+                    @foreach (var msg in Model.LastMessages)
+                    {
+                        <li>
+                            <div class="ad-avatar">@Initials(msg.SenderName)</div>
+                            <div class="meta">
+                                <strong>@msg.SenderName</strong>
+                                <span>@msg.SenderSubject</span>
+                            </div>
+                            <div class="text-end">
+                                @if (!msg.IsRead) { <span class="ad-badge terra">Yeni</span> }
+                                <div class="small text-muted mt-1">@msg.SendDate.ToString("dd MMM", tr)</div>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <div class="ad-empty"><i class="bi bi-inbox"></i>Henüz mesaj yok.</div>
+            }
+        </div>
+    </div>
+
+    <div class="col-xl-7">
+        <div class="ad-card h-100">
+            <div class="ad-card-head">
+                <div><h2>Son Projeler</h2><p>En son eklenen projeler</p></div>
+                <a asp-controller="Project" asp-action="CreateProject" class="ad-btn ad-btn-sm"><i class="bi bi-plus-lg"></i> Ekle</a>
+            </div>
+            @if (Model.LastProjects.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table ad-table">
+                        <thead><tr><th>Proje</th><th>Kategori</th><th>Durum</th><th></th></tr></thead>
+                        <tbody>
+                            @foreach (var p in Model.LastProjects)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-3">
+                                            @if (!string.IsNullOrWhiteSpace(p.ImageUrl))
+                                            {
+                                                <img src="@p.ImageUrl" class="ad-thumb" alt="">
+                                            }
+                                            else
+                                            {
+                                                <div class="ad-thumb"><i class="bi bi-image"></i></div>
+                                            }
+                                            <strong>@p.ProjectTitle</strong>
+                                        </div>
+                                    </td>
+                                    <td>@p.Category?.CategoryName</td>
+                                    <td><span class="ad-badge @(p.IsActive ? "on" : "off")">@(p.IsActive ? "Aktif" : "Pasif")</span></td>
+                                    <td class="text-end"><a asp-controller="Project" asp-action="UpdateProject" asp-route-id="@p.ProjectId" class="ad-icon-btn sm" title="Düzenle"><i class="bi bi-pencil"></i></a></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="ad-empty"><i class="bi bi-folder2-open"></i>Henüz proje eklenmedi.</div>
+            }
+        </div>
+    </div>
+
+    <div class="col-xl-5">
+        <div class="ad-card">
+            <div class="ad-card-head"><div><h2>Kategoriler</h2><p>Kategori başına proje sayısı</p></div></div>
+            @if (Model.CategorySummary.Any())
+            {
+                @foreach (var c in Model.CategorySummary)
+                {
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span>@c.CategoryName</span><strong>@c.ProjectCount</strong>
+                        </div>
+                        <div class="ad-progress"><span style="width:@(c.ProjectCount * 100 / maxCategory)%"></span></div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="ad-empty py-3">Kategori yok. <a asp-controller="Category" asp-action="CategoryList">Ekle</a></div>
+            }
+        </div>
+        <div class="ad-card">
+            <div class="ad-card-head"><div><h2>Hızlı Erişim</h2></div></div>
+            <div class="ad-quick">
+                <a asp-controller="Hero" asp-action="UpdateHero"><i class="bi bi-house-door"></i>Hero</a>
+                <a asp-controller="About" asp-action="UpdateAbout"><i class="bi bi-person"></i>Hakkımda</a>
+                <a asp-controller="Skill" asp-action="CreateSkill"><i class="bi bi-stars"></i>Yetenek Ekle</a>
+                <a asp-controller="Experience" asp-action="CreateExperience"><i class="bi bi-briefcase"></i>Deneyim Ekle</a>
+                <a asp-controller="Education" asp-action="CreateEducation"><i class="bi bi-mortarboard"></i>Eğitim Ekle</a>
+                <a asp-controller="Certificate" asp-action="CreateCertificate"><i class="bi bi-award"></i>Sertifika Ekle</a>
+            </div>
+        </div>
+    </div>
+</div>

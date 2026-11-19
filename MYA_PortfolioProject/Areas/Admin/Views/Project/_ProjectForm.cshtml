@@ -1,0 +1,66 @@
+@model Project
+@{
+    var action = ViewData["FormAction"] as string ?? "CreateProject";
+    var isUpdate = action == "UpdateProject";
+}
+<form asp-action="@action" method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="ProjectId">
+    <div class="row g-4">
+        <div class="col-xl-8">
+            <div class="ad-card">
+                <div class="ad-card-head">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="ad-head-ico"><i class="bi bi-code-square"></i></div>
+                        <div><h2>@ViewData["FormTitle"]</h2><p>Sitede proje kartı olarak gösterilir.</p></div>
+                    </div>
+                </div>
+                <div asp-validation-summary="ModelOnly"></div>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label asp-for="ProjectTitle" class="form-label">Proje Adı</label>
+                        <input asp-for="ProjectTitle" class="form-control">
+                        <span asp-validation-for="ProjectTitle"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="CategoryId" class="form-label">Kategori</label>
+                        <select asp-for="CategoryId" asp-items="@(ViewBag.Categories as SelectList)" class="form-select">
+                            <option value="0">Kategori seçin...</option>
+                        </select>
+                        <span asp-validation-for="CategoryId"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Technology" class="form-label">Teknolojiler</label>
+                        <input asp-for="Technology" class="form-control" placeholder="ASP.NET Core, EF Core, Bootstrap">
+                        <div class="form-text">Virgülle ayırın; her biri sitede ayrı etiket olur.</div>
+                        <span asp-validation-for="Technology"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="ProjectUrl" class="form-label">Proje Bağlantısı <span class="text-muted fw-normal">(isteğe bağlı)</span></label>
+                        <input asp-for="ProjectUrl" class="form-control" type="url" placeholder="https://github.com/...">
+                        <div class="form-text">Boş bırakılırsa sitedeki buton iletişim bölümüne yönlendirir.</div>
+                        <span asp-validation-for="ProjectUrl"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Description" class="form-label">Açıklama</label>
+                        <textarea asp-for="Description" class="form-control" rows="5"></textarea>
+                        <span asp-validation-for="Description"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4">
+            <div class="ad-card">
+                <div class="ad-section-title">Görsel ve Durum</div>
+                <partial name="_FileInput" model='new FileInputModel { Name = "imageFile", Label = "Proje görseli", CurrentUrl = Model.ImageUrl, RemoveName = isUpdate ? "removeImage" : null }' />
+                <label class="ad-switch" for="IsActive">
+                    <span>Sitede göster</span>
+                    <input asp-for="IsActive" class="form-check-input" role="switch">
+                </label>
+                <div class="ad-form-foot">
+                    <a asp-action="ProjectList" class="ad-btn-light">Vazgeç</a>
+                    <button type="submit" class="ad-btn"><i class="bi bi-check2"></i> Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

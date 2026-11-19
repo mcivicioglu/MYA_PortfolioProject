@@ -1,0 +1,47 @@
+@model HeroSection
+@{
+    ViewData["Title"] = "Ana Sayfa (Hero)";
+}
+<form asp-action="UpdateHero" method="post" enctype="multipart/form-data">
+    <div class="row g-4">
+        <div class="col-xl-8">
+            <div class="ad-card">
+                <div class="ad-card-head">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="ad-head-ico"><i class="bi bi-house-door"></i></div>
+                        <div><h2>Karşılama Alanı</h2><p>Sitenin ilk açılan bölümündeki metinler.</p></div>
+                    </div>
+                    <a asp-controller="HeroTitle" asp-action="HeroTitleList" class="ad-btn-light ad-btn-sm"><i class="bi bi-type"></i> Yazı Animasyonu</a>
+                </div>
+                <div asp-validation-summary="ModelOnly"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Greeting" class="form-label">Karşılama Metni</label>
+                    <input asp-for="Greeting" class="form-control" placeholder="Merhaba, ben Mahmut">
+                    <div class="form-text">Sitede büyük harflerle küçük bir etiket olarak görünür.</div>
+                    <span asp-validation-for="Greeting"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Title" class="form-label">Başlık</label>
+                    <input asp-for="Title" class="form-control" placeholder="Fikirleri Dijital Deneyimlere Dönüştürüyorum.">
+                    <span asp-validation-for="Title"></span>
+                </div>
+                <div>
+                    <label asp-for="Description" class="form-label">Açıklama</label>
+                    <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                    <span asp-validation-for="Description"></span>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4">
+            <div class="ad-card">
+                <div class="ad-section-title">Portre Görseli</div>
+                <partial name="_FileInput" model='new FileInputModel { Name = "imageFile", Label = "Hero görseli", CurrentUrl = Model.ImageURL, Portrait = true, RemoveName = "removeImage" }' />
+                <p class="form-text mb-0">Görsel yoksa sitede adınızın baş harfleri gösterilir.</p>
+                <div class="ad-form-foot">
+                    <button type="submit" class="ad-btn"><i class="bi bi-check2"></i> Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

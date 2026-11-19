@@ -1,0 +1,22 @@
+@model Category
+@{
+    ViewData["Title"] = "Kategori Düzenle";
+}
+<form asp-action="UpdateCategory" method="post">
+    <input type="hidden" asp-for="CategoryId">
+    <div class="ad-card" style="max-width: 640px;">
+        <div class="ad-card-head">
+            <div class="d-flex align-items-center gap-3">
+                <div class="ad-head-ico"><i class="bi bi-tags"></i></div>
+                <div><h2>Kategoriyi Düzenle</h2><p>Bu kategorideki projeler yeni adla listelenir.</p></div>
+            </div>
+        </div>
+        <label asp-for="CategoryName" class="form-label">Kategori Adı</label>
+        <input asp-for="CategoryName" class="form-control">
+        <span asp-validation-for="CategoryName"></span>
+        <div class="ad-form-foot">
+            <a asp-action="CategoryList" class="ad-btn-light">Vazgeç</a>
+            <button type="submit" class="ad-btn"><i class="bi bi-check2"></i> Kaydet</button>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,33 @@
+@model List<Experience>
+
+<section id="experience" class="section section-alt">
+    <div class="container">
+        <div class="reveal">
+            <span class="eyebrow">KARİYER YOLCULUĞUM</span>
+            <h2 class="title">Deneyimlerim ve Profesyonel Yolculuğum</h2>
+        </div>
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="timeline alt">
+                @foreach (var exp in Model)
+                {
+                    <article class="t-item reveal">
+                        <div class="t-card">
+                            <h3>@exp.Title</h3>
+                            <div class="t-org">@exp.Company</div>
+                            @if (!string.IsNullOrWhiteSpace(exp.CategoryName))
+                            {
+                                <span class="t-date">@exp.CategoryName</span>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(exp.Description))
+                            {
+                                <p>@exp.Description</p>
+                            }
+                        </div>
+                    </article>
+                }
+            </div>
+        }
+    </div>
+</section>

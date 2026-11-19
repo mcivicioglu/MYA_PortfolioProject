@@ -1,0 +1,58 @@
+@model List<Skill>
+@{
+    ViewData["Title"] = "Yetenekler";
+    string Icon(string? raw)
+    {
+        var clean = (raw ?? "").Replace("bi bi-", "").Replace("bi-", "").Trim();
+        return "bi-" + (string.IsNullOrEmpty(clean) ? "code-slash" : clean);
+    }
+}
+<div class="ad-card">
+    <div class="ad-card-head">
+        <div class="d-flex align-items-center gap-3">
+            <div class="ad-head-ico"><i class="bi bi-stars"></i></div>
+            <div><h2>Yetenek Grupları</h2><p>Sitede öncelik değeri yüksek olan grup önce gösterilir.</p></div>
+        </div>
+        <a asp-action="CreateSkill" class="ad-btn"><i class="bi bi-plus-lg"></i> Yeni Grup</a>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="row g-3">
+            @foreach (var skill in Model)
+            {
+                <div class="col-md-6 col-xxl-4">
+                    <div class="h-100 p-3 rounded-4 border d-flex flex-column" style="background: var(--bg); border-color: var(--line) !important;">
+                        <div class="d-flex align-items-start gap-3 mb-3">
+                            <div class="ad-icon-preview"><i class="bi @Icon(skill.IconURL)"></i></div>
+                            <div class="flex-grow-1 min-w-0">
+                                <strong class="d-block text-truncate">@skill.Title</strong>
+                                <span class="small text-muted">Öncelik @skill.SkillValue · @skill.SkillItems.Count teknoloji</span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            @foreach (var item in skill.SkillItems.OrderBy(x => x.SkillItemId))
+                            {
+                                <span class="ad-tag">@item.SkillItemTitle</span>
+                            }
+                            @if (!skill.SkillItems.Any())
+                            {
+                                <span class="small text-muted">Henüz teknoloji eklenmedi.</span>
+                            }
+                        </div>
+                        <div class="mt-auto d-flex justify-content-end gap-2">
+                            <a asp-action="UpdateSkill" asp-route-id="@skill.SkillId" class="ad-btn-light ad-btn-sm"><i class="bi bi-pencil"></i> Düzenle</a>
+                            <form asp-action="DeleteSkill" asp-route-id="@skill.SkillId" method="post">
+                                <button type="button" class="ad-icon-btn sm danger js-delete" data-name="@skill.Title" data-extra="Gruptaki tüm teknolojiler de silinir." title="Sil"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="ad-empty"><i class="bi bi-stars"></i>Henüz yetenek grubu yok.</div>
+    }
+</div>

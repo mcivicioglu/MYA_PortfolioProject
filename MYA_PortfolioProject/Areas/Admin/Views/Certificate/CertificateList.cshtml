@@ -1,0 +1,57 @@
+@model List<Certificate>
+@{
+    ViewData["Title"] = "Sertifikalar";
+}
+<div class="ad-card">
+    <div class="ad-card-head">
+        <div class="d-flex align-items-center gap-3">
+            <div class="ad-head-ico terra"><i class="bi bi-award"></i></div>
+            <div><h2>Sertifikalar ve Kurslar</h2><p>Hiç sertifika yoksa bu bölüm sitede gizlenir.</p></div>
+        </div>
+        <a asp-action="CreateCertificate" class="ad-btn"><i class="bi bi-plus-lg"></i> Yeni Sertifika</a>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table ad-table">
+                <thead><tr><th>Sertifika</th><th>Kurum</th><th>Tarih</th><th>Belge</th><th class="text-end">İşlemler</th></tr></thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><strong>@item.Title</strong></td>
+                            <td>@item.Institution</td>
+                            <td>@item.Date</td>
+                            <td>
+                                @if (!string.IsNullOrWhiteSpace(item.CertificateUrl))
+                                {
+                                    var isFile = item.CertificateUrl.StartsWith("/uploads/");
+                                    <a href="@item.CertificateUrl" target="_blank" rel="noopener noreferrer" class="ad-badge on text-decoration-none">
+                                        <i class="bi @(isFile ? "bi-file-earmark-check" : "bi-link-45deg")"></i> @(isFile ? "Dosya" : "Bağlantı")
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="ad-badge off">Yok</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="ad-actions">
+                                    <a asp-action="UpdateCertificate" asp-route-id="@item.CertificateId" class="ad-icon-btn sm" title="Düzenle"><i class="bi bi-pencil"></i></a>
+                                    <form asp-action="DeleteCertificate" asp-route-id="@item.CertificateId" method="post">
+                                        <button type="button" class="ad-icon-btn sm danger js-delete" data-name="@item.Title" title="Sil"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="ad-empty"><i class="bi bi-award"></i>Henüz sertifika eklenmedi.</div>
+    }
+</div>

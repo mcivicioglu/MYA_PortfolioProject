@@ -1,0 +1,47 @@
+@model Education
+@{
+    var action = ViewData["FormAction"] as string ?? "CreateEducation";
+}
+<form asp-action="@action" method="post">
+    <input type="hidden" asp-for="EducationId">
+    <div class="ad-card" style="max-width: 900px;">
+        <div class="ad-card-head">
+            <div class="d-flex align-items-center gap-3">
+                <div class="ad-head-ico"><i class="bi bi-mortarboard"></i></div>
+                <div><h2>@ViewData["FormTitle"]</h2><p>Bitiş yılını boş bırakırsanız “Devam Ediyor” olarak gösterilir.</p></div>
+            </div>
+        </div>
+        <div asp-validation-summary="ModelOnly"></div>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label asp-for="Department" class="form-label">Bölüm / Program</label>
+                <input asp-for="Department" class="form-control">
+                <span asp-validation-for="Department"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="SchoolName" class="form-label">Okul</label>
+                <input asp-for="SchoolName" class="form-control">
+                <span asp-validation-for="SchoolName"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="StartYear" class="form-label">Başlangıç Yılı</label>
+                <input asp-for="StartYear" class="form-control" min="1965" max="2026">
+                <span asp-validation-for="StartYear"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="EndYear" class="form-label">Bitiş Yılı <span class="text-muted fw-normal">(isteğe bağlı)</span></label>
+                <input asp-for="EndYear" class="form-control" min="1970" max="2026">
+                <span asp-validation-for="EndYear"></span>
+            </div>
+            <div class="col-12">
+                <label asp-for="Description" class="form-label">Açıklama <span class="text-muted fw-normal">(isteğe bağlı)</span></label>
+                <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="Description"></span>
+            </div>
+        </div>
+        <div class="ad-form-foot">
+            <a asp-action="EducationList" class="ad-btn-light">Vazgeç</a>
+            <button type="submit" class="ad-btn"><i class="bi bi-check2"></i> Kaydet</button>
+        </div>
+    </div>
+</form>

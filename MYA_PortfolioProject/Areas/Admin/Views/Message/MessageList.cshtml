@@ -1,0 +1,156 @@
+@model List<Message>
+@{
+    ViewData["Title"] = "Gelen Mesajlar";
+    var status = ViewBag.Status as string ?? "all";
+    var search = ViewBag.Search as string;
+    int total = ViewBag.TotalCount is int t ? t : 0;
+    int unread = ViewBag.UnreadCount is int u ? u : 0;
+    var tr = new System.Globalization.CultureInfo("tr-TR");
+    string Initials(string name) => string.Concat(name.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(x => char.ToUpper(x[0], tr)));
+}
+<div class="ad-card">
+    <div class="ad-card-head">
+        <div class="d-flex align-items-center gap-3">
+            <div class="ad-head-ico terra"><i class="bi bi-inbox"></i></div>
+            <div><h2>Gelen Kutusu</h2><p>@total mesaj · <span id="unreadText">@unread okunmamış</span></p></div>
+        </div>
+        @if (unread > 0)
+        {
+            <form asp-action="MarkAllAsRead" method="post">
+                <button type="submit" class="ad-btn-light"><i class="bi bi-check2-all"></i> Tümünü okundu yap</button>
+            </form>
+        }
+    </div>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div class="ad-tabs">
+            <a asp-action="MessageList" asp-route-search="@search" class="@(status == "all" ? "active" : "")">Tümü</a>
+            <a asp-action="MessageList" asp-route-status="unread" asp-route-search="@search" class="@(status == "unread" ? "active" : "")">Okunmamış</a>
+            <a asp-action="MessageList" asp-route-status="read" asp-route-search="@search" class="@(status == "read" ? "active" : "")">Okunmuş</a>
+        </div>
+        <form method="get" asp-action="MessageList" class="d-flex gap-2" role="search">
+            <input type="hidden" name="status" value="@status">
+            <input type="search" name="search" value="@search" class="form-control py-2" placeholder="Ad, e-posta veya konu ara" aria-label="Mesajlarda ara">
+            <button type="submit" class="ad-icon-btn" title="Ara"><i class="bi bi-search"></i></button>
+        </form>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table ad-table">
+                <thead><tr><th>Gönderen</th><th>Konu</th><th>Tarih</th><th>Durum</th><th class="text-end">İşlemler</th></tr></thead>
+                <tbody>
+                    @foreach (var msg in Model)
+                    {
+                        <tr class="@(msg.IsRead ? "" : "unread")" id="msg-@msg.MessageId">
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="ad-avatar">@Initials(msg.SenderName)</div>
+                                    <div class="min-w-0">
+                                        <div class="text-truncate" style="max-width: 220px;">@msg.SenderName</div>
+                                        <div class="small text-muted fw-normal text-truncate" style="max-width: 220px;">@msg.SenderEmail</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-truncate" style="max-width: 280px;">@msg.SenderSubject</td>
+                            <td class="text-nowrap small">@msg.SendDate.ToString("dd MMM yyyy HH:mm", tr)</td>
+                            <td><span class="ad-badge @(msg.IsRead ? "off" : "terra")" data-status-badge>@(msg.IsRead ? "Okundu" : "Yeni")</span></td>
+                            <td>
+                                <div class="ad-actions">
+                                    <button type="button" class="ad-icon-btn sm" title="Oku" data-open-message="@msg.MessageId"><i class="bi bi-envelope-open"></i></button>
+                                    <form asp-action="SetReadStatus" method="post">
+                                        <input type="hidden" name="id" value="@msg.MessageId">
+                                        <input type="hidden" name="isRead" value="@((!msg.IsRead).ToString().ToLower())">
+                                        <input type="hidden" name="returnStatus" value="@status">
+                                        <button type="submit" class="ad-icon-btn sm" title="@(msg.IsRead ? "Okunmadı yap" : "Okundu yap")"><i class="bi @(msg.IsRead ? "bi-envelope" : "bi-check2")"></i></button>
+                                    </form>
+                                    <form asp-action="DeleteMessage" method="post">
+                                        <input type="hidden" name="id" value="@msg.MessageId">
+                                        <input type="hidden" name="returnStatus" value="@status">
+                                        <button type="button" class="ad-icon-btn sm danger js-delete" data-name="@msg.SenderSubject" title="Sil"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="ad-empty"><i class="bi bi-inbox"></i>@(string.IsNullOrEmpty(search) ? "Bu görünümde mesaj yok." : "Aramayla eşleşen mesaj bulunamadı.")</div>
+    }
+</div>
+
+@* Mesaj okuma penceresi *@
+<div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content ad-modal">
+            <div class="modal-header border-0 px-4 pt-4 pb-0">
+                <div class="min-w-0">
+                    <h5 class="modal-title text-break" id="messageModalTitle">Mesaj</h5>
+                    <div class="small text-muted" id="messageModalMeta"></div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body px-4">
+                <div class="ad-msg-body" id="messageModalBody"></div>
+            </div>
+            <div class="modal-footer border-0 px-4 pb-4">
+                <a href="#" class="ad-btn" id="messageModalReply"><i class="bi bi-reply"></i> E-posta ile yanıtla</a>
+            </div>
+        </div>
+    </div>
+</div>
+@Html.AntiForgeryToken()
+
+@section Scripts {
+    <script>
+        (function () {
+            var modalEl = document.getElementById('messageModal');
+            var modal = new bootstrap.Modal(modalEl);
+            var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            var detailUrl = '@Url.Action("MessageDetail")';
+            var statusUrl = '@Url.Action("SetReadStatus")';
+
+            document.querySelectorAll('[data-open-message]').forEach(function (btn) {
+                btn.addEventListener('click', async function () {
+                    var id = btn.dataset.openMessage;
+                    var res = await fetch(detailUrl + '?id=' + id);
+                    if (!res.ok) return;
+                    var m = await res.json();
+
+                    document.getElementById('messageModalTitle').textContent = m.senderSubject;
+                    document.getElementById('messageModalMeta').textContent = m.senderName + ' · ' + m.senderEmail + ' · ' + m.sendDate;
+                    document.getElementById('messageModalBody').textContent = m.content;
+                    document.getElementById('messageModalReply').href =
+                        'mailto:' + encodeURIComponent(m.senderEmail) + '?subject=' + encodeURIComponent('Re: ' + m.senderSubject);
+                    modal.show();
+
+                    if (!m.isRead) {
+                        var body = new FormData();
+                        body.append('id', id);
+                        body.append('isRead', 'true');
+                        body.append('__RequestVerificationToken', token);
+                        var r = await fetch(statusUrl, { method: 'POST', body: body, headers: { 'X-Requested-With': 'fetch' } });
+                        if (r.ok) {
+                            var data = await r.json();
+                            var row = document.getElementById('msg-' + id);
+                            row.classList.remove('unread');
+                            var badge = row.querySelector('[data-status-badge]');
+                            badge.textContent = 'Okundu';
+                            badge.className = 'ad-badge off';
+                            document.getElementById('unreadText').textContent = data.unreadCount + ' okunmamış';
+                            var side = document.getElementById('sidebarUnreadBadge');
+                            if (side) { if (data.unreadCount > 0) side.textContent = data.unreadCount; else side.remove(); }
+                            var dot = document.getElementById('navUnreadDot');
+                            if (dot && data.unreadCount === 0) dot.remove();
+                        }
+                    }
+                });
+            });
+        })();
+    </script>
+}

@@ -1,0 +1,68 @@
+﻿@{
+    var phrasesJson = System.Text.Json.JsonSerializer.Serialize((IEnumerable<string>)ViewBag.phrases);
+    var imageUrl = ViewBag.imageUrl as string;
+}
+<section id="home" class="hero">
+    <div class="container">
+        <div class="row align-items-center gy-5">
+            <div class="col-lg-7">
+                <span class="eyebrow">@(((string)ViewBag.greeting).ToUpper(new System.Globalization.CultureInfo("tr-TR")))</span>
+                <h1>@ViewBag.title</h1>
+                <div class="typed-line" aria-live="off">
+                    <span id="typed"></span><span class="cursor" aria-hidden="true"></span>
+                </div>
+                <p class="lead-s">@ViewBag.description</p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="#projects" class="btn-pill btn-dark-p text-decoration-none">Projelerimi Keşfet</a>
+                    <a href="#contact" class="btn-pill btn-line text-decoration-none">Benimle İletişime Geç</a>
+                </div>
+                <div class="socials">
+                    @await Component.InvokeAsync("_DefaultSocialLinksComponentPartial", new { style = "icons" })
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="portrait-wrap">
+                    <div class="blob a"></div>
+                    <div class="blob b"></div>
+                    <div class="lines"></div>
+                    <div class="block-p"></div>
+                    @if (!string.IsNullOrWhiteSpace(imageUrl))
+                    {
+                        <div class="portrait">
+                            <img src="@imageUrl" alt="@ViewBag.nameSurname portre" class="w-100 h-100 object-fit-cover">
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="portrait" role="img" aria-label="@ViewBag.nameSurname portre görseli">
+                            <span>@ViewBag.initials</span>
+                        </div>
+                    }
+                    <div class="badge-float">
+                        <b>.NET</b>
+                        <small>Web &amp; Yazılım<br>Geliştirme</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <a href="#about" class="scroll-hint">Aşağı Kaydır</a>
+</section>
+
+<script>
+    (function () {
+        var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var words = @Html.Raw(phrasesJson);
+        var el = document.getElementById('typed'), w = 0, c = 0, del = false;
+        if (!el || !words.length) return;
+        if (reduce) { el.textContent = words[0]; return; }
+        (function tick() {
+            var word = words[w], delay = del ? 45 : 85;
+            c += del ? -1 : 1;
+            el.textContent = word.slice(0, c);
+            if (!del && c === word.length) { del = true; delay = 1400; }
+            else if (del && c === 0) { del = false; w = (w + 1) % words.length; delay = 350; }
+            setTimeout(tick, delay);
+        })();
+    })();
+</script>

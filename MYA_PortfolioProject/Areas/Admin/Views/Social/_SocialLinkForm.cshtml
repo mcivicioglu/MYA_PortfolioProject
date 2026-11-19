@@ -1,0 +1,38 @@
+@model SocialLink
+@{
+    var action = ViewData["FormAction"] as string ?? "CreateSocial";
+}
+<form asp-action="@action" method="post">
+    <input type="hidden" asp-for="SocialLinkId">
+    <div class="ad-card" style="max-width: 760px;">
+        <div class="ad-card-head">
+            <div class="d-flex align-items-center gap-3">
+                <div class="ad-icon-preview" id="socialIconPreview"></div>
+                <div><h2>@ViewData["FormTitle"]</h2><p>İkon, Bootstrap Icons adıyla girilir.</p></div>
+            </div>
+        </div>
+        <div asp-validation-summary="ModelOnly"></div>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label asp-for="Platform" class="form-label">Platform</label>
+                <input asp-for="Platform" class="form-control" placeholder="GitHub">
+                <span asp-validation-for="Platform"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Icon" class="form-label">İkon</label>
+                <input asp-for="Icon" class="form-control" placeholder="github" data-icon-input="socialIconPreview">
+                <div class="form-text">Örn: github, linkedin, youtube, instagram, twitter-x · <a href="https://icons.getbootstrap.com/" target="_blank" rel="noopener noreferrer">ikon listesi</a></div>
+                <span asp-validation-for="Icon"></span>
+            </div>
+            <div class="col-12">
+                <label asp-for="Url" class="form-label">Bağlantı</label>
+                <input asp-for="Url" class="form-control" type="url" placeholder="https://github.com/kullaniciadi">
+                <span asp-validation-for="Url"></span>
+            </div>
+        </div>
+        <div class="ad-form-foot">
+            <a asp-action="SocialList" class="ad-btn-light">Vazgeç</a>
+            <button type="submit" class="ad-btn"><i class="bi bi-check2"></i> Kaydet</button>
+        </div>
+    </div>
+</form>

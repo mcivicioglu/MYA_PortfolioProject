@@ -1,0 +1,53 @@
+@{
+    Layout = null;
+    var success = TempData["SuccessMessage"] as string;
+    var error = TempData["ErrorMessage"] as string;
+}
+<!DOCTYPE html>
+<html lang="tr">
+@await Component.InvokeAsync("_AdminLayoutHeadComponentPartial")
+<body>
+    <div class="ad-wrapper">
+        @await Component.InvokeAsync("_AdminLayoutSidebarComponentPartial")
+        <div class="ad-backdrop" id="adBackdrop"></div>
+
+        <div class="ad-main">
+            @await Component.InvokeAsync("_AdminLayoutNavbarComponentPartial")
+
+            <main class="ad-content">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    @* İşlem sonucu bildirimi (TempData) *@
+    @if (!string.IsNullOrEmpty(success) || !string.IsNullOrEmpty(error))
+    {
+        <div class="ad-toast @(string.IsNullOrEmpty(error) ? "ok" : "err")" id="adToast" role="status">
+            <i class="bi @(string.IsNullOrEmpty(error) ? "bi-check-circle-fill" : "bi-exclamation-circle-fill")"></i>
+            <span>@(error ?? success)</span>
+            <button type="button" aria-label="Kapat" onclick="this.parentElement.remove()"><i class="bi bi-x"></i></button>
+        </div>
+    }
+
+    @* Silme onayı: .js-delete butonları bu pencereyi açar *@
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content ad-modal">
+                <div class="modal-body text-center p-4">
+                    <div class="ad-modal-ico"><i class="bi bi-trash3"></i></div>
+                    <h5 id="deleteModalTitle" class="mb-2">Silmek istediğinize emin misiniz?</h5>
+                    <p class="text-muted mb-4" id="deleteModalText">Bu kayıt kalıcı olarak silinecek.</p>
+                    <div class="d-flex justify-content-center gap-2">
+                        <button type="button" class="ad-btn-light" data-bs-dismiss="modal">Vazgeç</button>
+                        <button type="button" class="ad-btn danger" id="deleteModalConfirm">Evet, sil</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @await Component.InvokeAsync("_AdminLayoutScriptComponentPartial")
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

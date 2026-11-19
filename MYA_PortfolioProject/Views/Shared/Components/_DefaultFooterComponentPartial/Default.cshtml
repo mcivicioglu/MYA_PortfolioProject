@@ -1,0 +1,25 @@
+﻿<footer>
+    <div class="container">
+        <div class="row gy-4 align-items-start">
+            <div class="col-md-5">
+                <a class="brand" href="#home">@ViewBag.NameSurname<span>.</span></a>
+                <p class="text-secondary mt-2 mb-0">Kod, yaratıcılık ve sürekli öğrenme.</p>
+            </div>
+            <div class="col-md-4">
+                <ul class="foot-links">
+                    <li><a href="#home">Ana Sayfa</a></li>
+                    <li><a href="#about">Hakkımda</a></li>
+                    <li><a href="#projects">Projelerim</a></li>
+                    <li><a href="#certificates">Sertifikalar</a></li>
+                    <li><a href="#contact">İletişim</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <div class="socials mt-0 justify-content-md-end">
+                    @await Component.InvokeAsync("_DefaultSocialLinksComponentPartial", new { style = "icons" })
+                </div>
+            </div>
+        </div>
+        <p class="copy mb-0">© @DateTime.Now.Year @ViewBag.NameSurname. Tüm hakları saklıdır.</p>
+    </div>
+</footer>

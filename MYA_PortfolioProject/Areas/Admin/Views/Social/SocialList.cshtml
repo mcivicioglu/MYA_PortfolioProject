@@ -1,0 +1,49 @@
+@model List<SocialLink>
+@{
+    ViewData["Title"] = "Sosyal Medya";
+}
+<div class="ad-card">
+    <div class="ad-card-head">
+        <div class="d-flex align-items-center gap-3">
+            <div class="ad-head-ico"><i class="bi bi-share"></i></div>
+            <div><h2>Bağlantılar</h2><p>Hero, iletişim bölümü ve footer'da aynı sırayla gösterilir.</p></div>
+        </div>
+        <a asp-action="CreateSocial" class="ad-btn"><i class="bi bi-plus-lg"></i> Yeni Bağlantı</a>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table ad-table">
+                <thead><tr><th>Platform</th><th>Bağlantı</th><th class="text-end">İşlemler</th></tr></thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        var icon = item.Icon.StartsWith("bi-") ? item.Icon : "bi-" + item.Icon.Replace("bi ", "");
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="ad-icon-preview" style="width:38px;height:38px;font-size:1.05rem;border-radius:11px"><i class="bi @icon"></i></div>
+                                    <strong>@item.Platform</strong>
+                                </div>
+                            </td>
+                            <td class="text-truncate" style="max-width: 320px;"><a href="@item.Url" target="_blank" rel="noopener noreferrer" class="text-muted">@item.Url</a></td>
+                            <td>
+                                <div class="ad-actions">
+                                    <a asp-action="UpdateSocial" asp-route-id="@item.SocialLinkId" class="ad-icon-btn sm" title="Düzenle"><i class="bi bi-pencil"></i></a>
+                                    <form asp-action="DeleteSocial" asp-route-id="@item.SocialLinkId" method="post">
+                                        <button type="button" class="ad-icon-btn sm danger js-delete" data-name="@item.Platform" title="Sil"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="ad-empty"><i class="bi bi-share"></i>Henüz bağlantı eklenmedi.</div>
+    }
+</div>

@@ -1,0 +1,52 @@
+@model FileInputModel
+@{
+    var previewId = "preview_" + Model.Name;
+    var hasFile = !string.IsNullOrWhiteSpace(Model.CurrentUrl);
+    var isPdf = hasFile && Model.CurrentUrl!.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase);
+}
+<div class="mb-3">
+    <label class="form-label" for="@Model.Name">@Model.Label</label>
+    <div class="ad-file">
+        @if (Model.IsImage)
+        {
+            <div class="ad-file-preview @(Model.Portrait ? "portrait" : "")" id="@previewId">
+                @if (hasFile && !isPdf)
+                {
+                    <img src="@Model.CurrentUrl" alt="Mevcut görsel">
+                }
+                else if (isPdf)
+                {
+                    <i class="bi bi-file-earmark-pdf"></i>
+                }
+                else
+                {
+                    <i class="bi bi-image"></i>
+                }
+            </div>
+        }
+        else
+        {
+            <div id="@previewId" class="d-none"></div>
+            @if (hasFile)
+            {
+                <a href="@Model.CurrentUrl" target="_blank" rel="noopener noreferrer" class="ad-file-doc">
+                    <i class="bi bi-file-earmark-pdf"></i>
+                    <span>Mevcut dosyayı görüntüle</span>
+                    <i class="bi bi-box-arrow-up-right ms-auto fs-6 text-muted"></i>
+                </a>
+            }
+        }
+
+        <input type="file" class="form-control" id="@Model.Name" name="@Model.Name" accept="@Model.Accept" data-file-input="@previewId">
+        <div class="form-text mt-2">@Model.Hint</div>
+        @Html.ValidationMessage(Model.Name, new { @class = "text-danger d-block mt-1" })
+
+        @if (hasFile && !string.IsNullOrEmpty(Model.RemoveName))
+        {
+            <div class="form-check mt-2">
+                <input class="form-check-input" type="checkbox" value="true" id="@Model.RemoveName" name="@Model.RemoveName" data-remove-for="@Model.Name">
+                <label class="form-check-label small" for="@Model.RemoveName">Mevcut dosyayı kaldır</label>
+            </div>
+        }
+    </div>
+</div>

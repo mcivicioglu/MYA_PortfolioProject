@@ -1,0 +1,110 @@
+﻿@model List<Project>
+@{
+    var categories = ViewBag.Categories as List<Category> ?? new List<Category>();
+    int? selectedCategory = ViewBag.SelectedCategoryId as int?;
+    var selectedSort = ViewBag.SelectedSort as string ?? "newest";
+
+    var sortLabels = new Dictionary<string, string>
+    {
+        { "newest", "En yeni önce" },
+        { "oldest", "En eski önce" },
+        { "title", "Ada göre (A-Z)" }
+    };
+    var currentSortLabel = sortLabels.ContainsKey(selectedSort) ? sortLabels[selectedSort] : "En yeni önce";
+    var index = 0;
+}
+
+<section id="projects" class="section">
+    <div class="container">
+        <div class="reveal">
+            <span class="eyebrow">SEÇİLMİŞ ÇALIŞMALAR</span>
+            <h2 class="title mb-3">Fikirden Ürüne Dönüşen Projeler</h2>
+            <p class="lead-s">Öğrenme, üretme ve problem çözme süreçlerimin birer yansıması olan projelerimden bazıları.</p>
+        </div>
+
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 filters">
+            <div class="d-flex flex-wrap gap-2" id="projectFilters">
+                <a class="filter-link @(selectedCategory == null ? "active" : "")"
+                   href="@Url.Action("Index", "Default", new { sort = selectedSort }, null, null, "projects")">Tümü</a>
+                @foreach (var category in categories)
+                {
+                    <a class="filter-link @(selectedCategory == category.CategoryId ? "active" : "")"
+                       href="@Url.Action("Index", "Default", new { category = category.CategoryId, sort = selectedSort }, null, null, "projects")">@category.CategoryName</a>
+                }
+            </div>
+
+            <div class="dropdown">
+                <button class="filter-link dropdown-toggle d-inline-flex align-items-center gap-2"
+                        type="button"
+                        id="projectSortDropdown"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                        style="background: var(--card);">
+                    <i class="bi bi-arrow-down-up"></i>
+                    <span>@currentSortLabel</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm border rounded-4 p-1 mt-2" aria-labelledby="projectSortDropdown">
+                    @foreach (var sort in sortLabels)
+                    {
+                        <li>
+                            <a class="dropdown-item rounded-3 small py-2 @(selectedSort == sort.Key ? "active fw-semibold" : "")"
+                               href="@Url.Action("Index", "Default", new { category = selectedCategory, sort = sort.Key }, null, null, "projects")">@sort.Value</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+
+        <div class="row g-4" id="projectGrid">
+            @foreach (var project in Model)
+            {
+                var technologies = (project.Technology ?? string.Empty)
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                var artClass = "t" + (index++ % 4 + 1);
+                var hasUrl = !string.IsNullOrWhiteSpace(project.ProjectUrl);
+
+                <div class="col-md-6 reveal">
+                    <article class="p-card">
+                        <div class="p-thumb">
+                            @if (!string.IsNullOrWhiteSpace(project.ImageUrl))
+                            {
+                                <img src="@project.ImageUrl" alt="@project.ProjectTitle">
+                            }
+                            else
+                            {
+                                <div class="art @artClass"><i class="bi bi-folder2-open"></i></div>
+                            }
+                        </div>
+                        <div class="p-body">
+                            <span class="p-cat">@project.Category?.CategoryName</span>
+                            <h3>@project.ProjectTitle</h3>
+                            <p>@project.Description</p>
+                            <div class="tags">
+                                @foreach (var tech in technologies)
+                                {
+                                    <span class="tag">@tech</span>
+                                }
+                            </div>
+                            <div class="p-foot">
+                                @if (hasUrl)
+                                {
+                                    <a href="@project.ProjectUrl" target="_blank" rel="noopener noreferrer" class="btn-pill btn-line btn-sm-p text-decoration-none">Projeyi İncele</a>
+                                }
+                                else
+                                {
+                                    <a href="#contact" class="btn-pill btn-line btn-sm-p text-decoration-none">Detay İçin Yaz</a>
+                                }
+                                <span class="arrow" aria-hidden="true"><i class="bi bi-arrow-right"></i></span>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            }
+
+            @if (!Model.Any())
+            {
+                <div class="col-12 text-center text-muted py-5">Bu kategoride gösterilecek proje bulunamadı.</div>
+            }
+        </div>
+    </div>
+</section>

@@ -1,0 +1,48 @@
+@model List<HeroTitle>
+@{
+    ViewData["Title"] = "Yazı Animasyonu";
+}
+<div class="ad-card">
+    <div class="ad-card-head">
+        <div class="d-flex align-items-center gap-3">
+            <div class="ad-head-ico"><i class="bi bi-type"></i></div>
+            <div><h2>Unvanlar</h2><p>Hero'da sırayla yazılıp silinen ifadeler. Yalnızca aktif olanlar gösterilir.</p></div>
+        </div>
+        <a asp-action="CreateHeroTitle" class="ad-btn"><i class="bi bi-plus-lg"></i> Yeni Unvan</a>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table ad-table">
+                <thead><tr><th style="width:80px">Sıra</th><th>Unvan</th><th>Durum</th><th class="text-end">İşlemler</th></tr></thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><span class="ad-badge off">@item.Order</span></td>
+                            <td><strong>@item.Title</strong></td>
+                            <td>
+                                <form asp-action="ToggleHeroTitleStatus" asp-route-id="@item.HeroTitleId" method="post">
+                                    <button type="submit" class="ad-badge @(item.IsActive ? "on" : "off")" title="Durumu değiştir">@(item.IsActive ? "Aktif" : "Pasif")</button>
+                                </form>
+                            </td>
+                            <td>
+                                <div class="ad-actions">
+                                    <a asp-action="UpdateHeroTitle" asp-route-id="@item.HeroTitleId" class="ad-icon-btn sm" title="Düzenle"><i class="bi bi-pencil"></i></a>
+                                    <form asp-action="DeleteHeroTitle" asp-route-id="@item.HeroTitleId" method="post">
+                                        <button type="button" class="ad-icon-btn sm danger js-delete" data-name="@item.Title" title="Sil"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="ad-empty"><i class="bi bi-type"></i>Henüz unvan yok. Eklenmezse sitede varsayılan ifadeler gösterilir.</div>
+    }
+</div>

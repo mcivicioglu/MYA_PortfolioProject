@@ -1,0 +1,130 @@
+﻿@model Contact?
+<section id="contact" class="section">
+    <div class="container">
+        <div class="row gy-5 gx-xl-6">
+            <div class="col-lg-5 reveal">
+                <span class="eyebrow">İLETİŞİME GEÇELİM</span>
+                <h2 class="title mb-3">@(Model?.Title ?? "Harika Bir Fikrin mi Var? Birlikte Hayata Geçirelim.")</h2>
+                <p class="lead-s">@(Model?.Description ?? "Yeni projeler, yazılım geliştirme veya iş birlikleri için benimle iletişime geçebilirsin.")</p>
+                <ul class="c-list">
+                    @if (!string.IsNullOrWhiteSpace(Model?.Email))
+                    {
+                        <li><a href="mailto:@Model.Email"><i class="bi bi-envelope"></i>@Model.Email</a></li>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(Model?.PhoneNumber))
+                    {
+                        <li><a href="tel:@Model.PhoneNumber.Replace(" ", "")"><i class="bi bi-telephone"></i>@Model.PhoneNumber</a></li>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(Model?.Location))
+                    {
+                        <li><div><i class="bi bi-geo-alt"></i>@Model.Location</div></li>
+                    }
+                    @await Component.InvokeAsync("_DefaultSocialLinksComponentPartial", new { style = "list" })
+                </ul>
+            </div>
+
+            <div class="col-lg-7 reveal">
+                <form class="form-card" id="contactForm" method="post" asp-controller="Contact" asp-action="SendMessage" novalidate>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" for="fName">Adınız Soyadınız</label>
+                            <input class="form-control" id="fName" name="SenderName" type="text" autocomplete="name" required minlength="3" maxlength="100">
+                            <div class="invalid-feedback" data-error-for="SenderName">Lütfen adınızı ve soyadınızı girin.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="fMail">E-posta Adresiniz</label>
+                            <input class="form-control" id="fMail" name="SenderEmail" type="email" autocomplete="email" required maxlength="150">
+                            <div class="invalid-feedback" data-error-for="SenderEmail">Geçerli bir e-posta adresi girin.</div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="fSubj">Konu</label>
+                            <input class="form-control" id="fSubj" name="SenderSubject" type="text" required maxlength="150">
+                            <div class="invalid-feedback" data-error-for="SenderSubject">Lütfen bir konu yazın.</div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="fMsg">Mesajınız</label>
+                            <textarea class="form-control" id="fMsg" name="Content" rows="5" required minlength="10" maxlength="2000"></textarea>
+                            <div class="invalid-feedback" data-error-for="Content">Mesajınız en az 10 karakter olmalı.</div>
+                        </div>
+
+                        @* Honeypot: gerçek kullanıcılar görmez, spam botları doldurur. *@
+                        <div style="position:absolute;left:-9999px;" aria-hidden="true">
+                            <label for="website">Web sitesi</label>
+                            <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+                        </div>
+
+                        <div class="col-12">
+                            <button class="btn-pill btn-dark-p" type="submit">Mesajımı Gönder</button>
+                            <p class="note mb-0" id="formFeedback" role="status" aria-live="polite"></p>
+                            <p class="note mb-0">Gönderdiğiniz bilgiler yalnızca sizinle iletişime geçmek için kullanılır.</p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    (function () {
+        var form = document.getElementById('contactForm');
+        if (!form) return;
+        var feedback = document.getElementById('formFeedback');
+        var submitButton = form.querySelector('button[type="submit"]');
+        var fields = form.querySelectorAll('input[required],textarea[required]');
+        var defaults = {};
+        form.querySelectorAll('[data-error-for]').forEach(function (el) { defaults[el.dataset.errorFor] = el.textContent; });
+
+        function setFeedback(text, color) {
+            feedback.textContent = text;
+            feedback.style.color = color || '';
+        }
+
+        function markInvalid(name, text) {
+            var input = form.querySelector('[name="' + name + '"]');
+            var target = form.querySelector('[data-error-for="' + name + '"]');
+            if (target) target.textContent = text || defaults[name];
+            if (input) input.classList.add('is-invalid');
+        }
+
+        function validate() {
+            var ok = true;
+            fields.forEach(function (f) {
+                var valid = f.checkValidity() && f.value.trim() !== '';
+                if (f.type === 'email') valid = valid && /^[^\s@@]+@@[^\s@@]+\.[^\s@@]{2,}$/.test(f.value);
+                f.classList.toggle('is-invalid', !valid);
+                if (!valid) { markInvalid(f.name); ok = false; }
+            });
+            return ok;
+        }
+
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            setFeedback('');
+            if (!validate()) {
+                form.querySelector('.is-invalid').focus();
+                return;
+            }
+
+            submitButton.disabled = true;
+            setFeedback('Gönderiliyor...');
+            try {
+                var response = await fetch(form.action, { method: 'POST', body: new FormData(form) });
+                var result = await response.json();
+                if (response.ok && result.success) {
+                    form.reset();
+                    setFeedback(result.message, 'var(--sage-d)');
+                } else {
+                    Object.keys(result.errors || {}).forEach(function (k) { markInvalid(k, result.errors[k]); });
+                    setFeedback(result.message || 'Mesaj gönderilemedi.', '#A04435');
+                }
+            } catch (err) {
+                setFeedback('Bir sorun oluştu. Lütfen daha sonra tekrar deneyin.', '#A04435');
+            } finally {
+                submitButton.disabled = false;
+            }
+        });
+
+        form.addEventListener('input', function (e) { e.target.classList.remove('is-invalid'); });
+    })();
+</script>

@@ -1,0 +1,57 @@
+@model Certificate
+@{
+    var action = ViewData["FormAction"] as string ?? "CreateCertificate";
+    var isUpdate = action == "UpdateCertificate";
+    var isUploaded = Model.CertificateUrl?.StartsWith("/uploads/") == true;
+}
+<form asp-action="@action" method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="CertificateId">
+    <div class="row g-4">
+        <div class="col-xl-8">
+            <div class="ad-card">
+                <div class="ad-card-head">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="ad-head-ico terra"><i class="bi bi-award"></i></div>
+                        <div><h2>@ViewData["FormTitle"]</h2><p>Kurs, sertifika veya katılım belgesi.</p></div>
+                    </div>
+                </div>
+                <div asp-validation-summary="ModelOnly"></div>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label asp-for="Title" class="form-label">Sertifika / Kurs Adı</label>
+                        <input asp-for="Title" class="form-control">
+                        <span asp-validation-for="Title"></span>
+                    </div>
+                    <div class="col-md-7">
+                        <label asp-for="Institution" class="form-label">Kurum</label>
+                        <input asp-for="Institution" class="form-control" placeholder="Udemy, BTK Akademi...">
+                        <span asp-validation-for="Institution"></span>
+                    </div>
+                    <div class="col-md-5">
+                        <label asp-for="Date" class="form-label">Tarih</label>
+                        <input asp-for="Date" class="form-control" placeholder="Mart 2026">
+                        <span asp-validation-for="Date"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="CertificateUrl" class="form-label">Belge Bağlantısı <span class="text-muted fw-normal">(isteğe bağlı)</span></label>
+                        <input asp-for="CertificateUrl" class="form-control" placeholder="https://..." readonly="@isUploaded">
+                        <div class="form-text">
+                            @(isUploaded ? "Belge dosya olarak yüklendi. Bağlantı girmek için önce dosyayı kaldırın." : "Doğrulama bağlantısı girin ya da sağdan belge dosyası yükleyin. Dosya yüklenirse bağlantının yerine geçer.")
+                        </div>
+                        <span asp-validation-for="CertificateUrl"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4">
+            <div class="ad-card">
+                <div class="ad-section-title">Belge Dosyası</div>
+                <partial name="_FileInput" model='new FileInputModel { Name = "certificateFile", Label = "Görsel veya PDF", CurrentUrl = isUploaded ? Model.CertificateUrl : null, Accept = FileKinds.Accept(FileKinds.ImagesAndDocuments), Hint = "JPG, PNG, WEBP, GIF veya PDF · en fazla 5 MB", RemoveName = isUpdate ? "removeFile" : null }' />
+                <div class="ad-form-foot">
+                    <a asp-action="CertificateList" class="ad-btn-light">Vazgeç</a>
+                    <button type="submit" class="ad-btn"><i class="bi bi-check2"></i> Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

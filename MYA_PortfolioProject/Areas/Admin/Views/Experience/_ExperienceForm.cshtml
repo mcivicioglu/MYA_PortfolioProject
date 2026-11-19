@@ -1,0 +1,49 @@
+@model Experience
+@{
+    var action = ViewData["FormAction"] as string ?? "CreateExperience";
+}
+<form asp-action="@action" method="post">
+    <input type="hidden" asp-for="ExperienceId">
+    <div class="ad-card" style="max-width: 900px;">
+        <div class="ad-card-head">
+            <div class="d-flex align-items-center gap-3">
+                <div class="ad-head-ico"><i class="bi bi-briefcase"></i></div>
+                <div><h2>@ViewData["FormTitle"]</h2><p>Sitede zaman çizelgesinde bir kart olarak gösterilir.</p></div>
+            </div>
+        </div>
+        <div asp-validation-summary="ModelOnly"></div>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label asp-for="Title" class="form-label">Pozisyon</label>
+                <input asp-for="Title" class="form-control" placeholder="Yazılım Geliştirici">
+                <span asp-validation-for="Title"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Company" class="form-label">Şirket / Kurum</label>
+                <input asp-for="Company" class="form-control">
+                <span asp-validation-for="Company"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="CategoryName" class="form-label">Etiket</label>
+                <input asp-for="CategoryName" class="form-control" placeholder="Tam zamanlı · 2022 - Devam">
+                <div class="form-text">Kartta küçük rozet olarak görünür (çalışma şekli, tarih aralığı vb.).</div>
+                <span asp-validation-for="CategoryName"></span>
+            </div>
+            <div class="col-md-6 d-flex align-items-end">
+                <label class="ad-switch w-100" for="IsActive">
+                    <span>Sitede göster</span>
+                    <input asp-for="IsActive" class="form-check-input" role="switch">
+                </label>
+            </div>
+            <div class="col-12">
+                <label asp-for="Description" class="form-label">Açıklama</label>
+                <textarea asp-for="Description" class="form-control" rows="5"></textarea>
+                <span asp-validation-for="Description"></span>
+            </div>
+        </div>
+        <div class="ad-form-foot">
+            <a asp-action="ExperienceList" class="ad-btn-light">Vazgeç</a>
+            <button type="submit" class="ad-btn"><i class="bi bi-check2"></i> Kaydet</button>
+        </div>
+    </div>
+</form>

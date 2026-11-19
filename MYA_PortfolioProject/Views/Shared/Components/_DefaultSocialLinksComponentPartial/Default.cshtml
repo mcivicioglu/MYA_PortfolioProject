@@ -1,0 +1,27 @@
+﻿@model List<SocialLink>
+@{
+    var style = ViewBag.Style as string ?? "icons";
+
+    // "github", "bi-github" ya da "bi bi-github" kayıtlarının hepsini "bi bi-github" yapar.
+    string IconClass(string? raw)
+    {
+        var clean = (raw ?? string.Empty).Replace("bi bi-", "").Replace("bi-", "").Replace("bi ", "").Trim();
+        return string.IsNullOrWhiteSpace(clean) ? "bi bi-link-45deg" : $"bi bi-{clean}";
+    }
+}
+@if (Model != null && Model.Any())
+{
+    foreach (var social in Model)
+    {
+        if (style == "list")
+        {
+            <li>
+                <a href="@social.Url" target="_blank" rel="noopener noreferrer"><i class="@IconClass(social.Icon)"></i>@social.Platform</a>
+            </li>
+        }
+        else
+        {
+            <a href="@social.Url" target="_blank" rel="noopener noreferrer" aria-label="@social.Platform" title="@social.Platform"><i class="@IconClass(social.Icon)"></i></a>
+        }
+    }
+}

@@ -1,0 +1,43 @@
+@model Skill
+@{
+    var action = ViewData["FormAction"] as string ?? "CreateSkill";
+}
+<form asp-action="@action" method="post">
+    <input type="hidden" asp-for="SkillId">
+    <div class="ad-card">
+        <div class="ad-card-head">
+            <div class="d-flex align-items-center gap-3">
+                <div class="ad-icon-preview" id="skillIconPreview"></div>
+                <div><h2>@ViewData["FormTitle"]</h2><p>Sitede “Teknoloji Yığınım” bölümünde bir kart olarak gösterilir.</p></div>
+            </div>
+        </div>
+        <div asp-validation-summary="ModelOnly"></div>
+        <div class="row g-3">
+            <div class="col-md-8">
+                <label asp-for="Title" class="form-label">Grup Adı</label>
+                <input asp-for="Title" class="form-control" placeholder="Backend Geliştirme">
+                <span asp-validation-for="Title"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="SkillValue" class="form-label">Öncelik (0-100)</label>
+                <input asp-for="SkillValue" class="form-control" min="0" max="100">
+                <span asp-validation-for="SkillValue"></span>
+            </div>
+            <div class="col-12">
+                <label asp-for="IconURL" class="form-label">İkon</label>
+                <input asp-for="IconURL" class="form-control" placeholder="braces" data-icon-input="skillIconPreview">
+                <div class="form-text">Bootstrap Icons adı. Örn: braces, database, window-stack, stars · <a href="https://icons.getbootstrap.com/" target="_blank" rel="noopener noreferrer">ikon listesi</a></div>
+                <span asp-validation-for="IconURL"></span>
+            </div>
+            <div class="col-12">
+                <label asp-for="Description" class="form-label">Açıklama <span class="text-muted fw-normal">(isteğe bağlı)</span></label>
+                <textarea asp-for="Description" class="form-control" rows="3" style="min-height: 90px;"></textarea>
+                <span asp-validation-for="Description"></span>
+            </div>
+        </div>
+        <div class="ad-form-foot">
+            <a asp-action="SkillList" class="ad-btn-light">Listeye Dön</a>
+            <button type="submit" class="ad-btn"><i class="bi bi-check2"></i> Kaydet</button>
+        </div>
+    </div>
+</form>

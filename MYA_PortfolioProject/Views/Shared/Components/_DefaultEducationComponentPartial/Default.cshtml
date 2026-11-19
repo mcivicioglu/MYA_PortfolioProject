@@ -1,0 +1,44 @@
+@model List<Education>
+
+<section id="education" class="section section-alt">
+    <div class="container">
+        <div class="row gy-5 gx-xl-6">
+            <div class="col-lg-6 reveal">
+                <span class="eyebrow">AKADEMİK YOLCULUK</span>
+                <h2 class="title">Eğitim Hayatım</h2>
+                @if (Model != null && Model.Any())
+                {
+                    <div class="timeline">
+                        @foreach (var edu in Model)
+                        {
+                            var yearRange = edu.EndYear.HasValue
+                                ? $"{edu.StartYear} - {edu.EndYear.Value}"
+                                : $"{edu.StartYear} - Devam Ediyor";
+
+                            <article class="t-item">
+                                <div class="t-card">
+                                    <h3>@edu.Department</h3>
+                                    <div class="t-org">@edu.SchoolName</div>
+                                    @if (edu.StartYear > 0)
+                                    {
+                                        <span class="t-date">@yearRange</span>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(edu.Description))
+                                    {
+                                        <p>@edu.Description</p>
+                                    }
+                                </div>
+                            </article>
+                        }
+                    </div>
+                }
+            </div>
+            <div class="col-lg-6 reveal">
+                <div class="quote-card">
+                    <blockquote>“Öğrenmek bir varış noktası değil, sürekli devam eden bir yolculuktur.”</blockquote>
+                    <p>Sürekli öğrenmeye, yazılım geliştirmeye, teknik araştırmalara ve edindiğim bilgiyi paylaşmaya değer veriyorum.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
